@@ -1,2 +1,5 @@
 node_modules
 react/node_modules
+package-lock.json
+react/package-lock.json
+.env
