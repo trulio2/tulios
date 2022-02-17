@@ -1,19 +1,15 @@
 import express from 'express'
 import bodyParser from 'body-parser'
-import 'dotenv'
+import router from './api/routes.js'
+import 'dotenv/config'
 
 const app = express()
+
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use(bodyParser.text())
+app.set('trust proxy', true)
 
-app.use('/paper-kit-react', (request, response) => {
-  const url = `build/${request.url}`
-  response.sendFile(url, { root: '.' })
-})
+app.use(router)
 
-app.get('*', (request, response) => {
-  response.sendFile('build/index.html', { root: '.' })
-})
-
-app.listen(process.env.PORT || 8080)
+app.listen(process.env.PORT)
