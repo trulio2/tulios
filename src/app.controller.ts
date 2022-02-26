@@ -8,7 +8,6 @@ export class AppController {
 
   @Get()
   root(@Res() response: Response) {
-    console.log('1');
     response.sendFile('index.html', { root: 'build' });
   }
 }
