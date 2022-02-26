@@ -4,6 +4,7 @@ import { AppModule } from './app.module'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
+  app.enableCors()
 
   const config = new DocumentBuilder()
     .setTitle('TulioS API')
@@ -15,6 +16,6 @@ async function bootstrap() {
 
   SwaggerModule.setup('/doc', app, documment)
 
-  await app.listen(process.env.PORT || 3000)
+  await app.listen(process.env.PORT || 3001)
 }
 bootstrap()
