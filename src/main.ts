@@ -1,20 +1,20 @@
-import { NestFactory } from '@nestjs/core';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { AppModule } from './app.module';
+import { NestFactory } from '@nestjs/core'
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
+import { AppModule } from './app.module'
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule)
 
   const config = new DocumentBuilder()
     .setTitle('TulioS API')
     .setDescription('Main API')
     .setVersion('0.0.1')
-    .build();
+    .build()
 
-  const documment = SwaggerModule.createDocument(app, config);
+  const documment = SwaggerModule.createDocument(app, config)
 
-  SwaggerModule.setup('/doc', app, documment);
+  SwaggerModule.setup('/doc', app, documment)
 
-  await app.listen(process.env.PORT || 3000);
+  await app.listen(process.env.PORT || 3000)
 }
-bootstrap();
+bootstrap()
