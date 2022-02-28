@@ -1,7 +1,7 @@
 -- CreateTable
 CREATE TABLE "user" (
     "id" SERIAL NOT NULL,
-    "username" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "created" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated" TIMESTAMP(3) NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE "message" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "user_username_key" ON "user"("username");
+CREATE UNIQUE INDEX "user_name_key" ON "user"("name");
 
 -- AddForeignKey
 ALTER TABLE "message" ADD CONSTRAINT "message_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

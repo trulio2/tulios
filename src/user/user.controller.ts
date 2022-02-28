@@ -1,63 +1,82 @@
-import { Body, Controller, Post, Put } from '@nestjs/common'
-import { PrismaClient } from '@prisma/client'
-import { checkUser } from '../library/validation'
+import {
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  ParseIntPipe,
+  Query,
+  UnauthorizedException
+} from '@nestjs/common'
+import { Post, Put, Body } from '@nestjs/common'
+import { UserService } from './user.service'
+import { LoginUserDto } from './dto/login-user.dto'
+import { CreateUserDto } from './dto/create-user.dto'
+import { LogoutUserDto } from './dto/logout-user.dto'
+import {
+  ApiBadRequestResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiQuery,
+  ApiTags,
+  ApiUnauthorizedResponse
+} from '@nestjs/swagger'
+import { User } from './entities/user.entity'
 
-const prisma = new PrismaClient()
-
+@ApiTags('User')
 @Controller('user')
 export class UserController {
+  constructor(private userService: UserService) {}
+
+  @ApiOkResponse({ type: User, isArray: true })
+  @ApiQuery({ name: 'name', required: false })
+  @ApiNotFoundResponse()
+  @Get()
+  async getUsers(@Query('name') name?: string): Promise<User[]> {
+    const users = await this.userService.users(name)
+    if (!users) throw new NotFoundException()
+
+    return users
+  }
+
+  @ApiOkResponse({ type: User })
+  @ApiNotFoundResponse()
+  @Get(':id')
+  async getUserById(@Param('id', ParseIntPipe) id: number): Promise<User> {
+    const user = await this.userService.userById(id)
+    if (!user) throw new NotFoundException()
+
+    return user
+  }
+
+  @ApiOkResponse({ type: User })
+  @ApiNotFoundResponse()
+  @ApiBadRequestResponse()
   @Put('login')
-  async login(@Body() body: any) {
-    const user = await checkUser({ username: body.username })
+  async putLogin(@Body() body: LoginUserDto): Promise<User> {
+    const login = await this.userService.login(body)
+    if (!login) throw new NotFoundException()
 
-    if (!user)
-      return {
-        error: 'Username or Password incorrect'
-      }
-
-    await prisma.user.update({
-      where: { username: body.username },
-      data: {
-        logged: true
-      }
-    })
-
-    return user
+    return login
   }
 
+  @ApiOkResponse({ type: User })
+  @ApiUnauthorizedResponse()
+  @ApiBadRequestResponse()
   @Post('create')
-  async createUser(@Body() body: any) {
-    let user = await prisma.user.findUnique({
-      where: { username: body.username }
-    })
-    if (user)
-      return {
-        error: 'Username not avaliable'
-      }
+  async postCreate(@Body() body: CreateUserDto): Promise<User> {
+    const create = await this.userService.create(body)
+    if (!create) throw new UnauthorizedException()
 
-    console.log('post', body)
-    user = await prisma.user.create({
-      data: { ...body, logged: false, type: 0 }
-    })
-
-    return user
+    return create
   }
 
+  @ApiOkResponse({ type: User })
+  @ApiNotFoundResponse()
   @Put('logout')
-  async logout(@Body() body: any) {
-    const user = await checkUser({ id: Number(body.id) })
-    if (!user)
-      return {
-        error: 'Use not found'
-      }
+  async putLogout(@Body() body: LogoutUserDto): Promise<User> {
+    const logout = await this.userService.logout(body)
+    if (!logout) throw new NotFoundException()
 
-    await prisma.user.update({
-      where: { id: Number(body.id) },
-      data: {
-        logged: false
-      }
-    })
-
-    return user
+    return logout
   }
 }
