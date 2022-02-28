@@ -1,15 +1,14 @@
 import { Body, Controller, Post, Put } from '@nestjs/common'
 import { PrismaClient } from '@prisma/client'
+import { checkUser } from '../library/validation'
 
 const prisma = new PrismaClient()
 
 @Controller('user')
 export class UserController {
-  @Post('login')
+  @Put('login')
   async login(@Body() body: any) {
-    const user = await prisma.user.findUnique({
-      where: { username: body.username }
-    })
+    const user = await checkUser({ username: body.username })
 
     if (!user)
       return {
@@ -22,6 +21,7 @@ export class UserController {
         logged: true
       }
     })
+
     return user
   }
 
@@ -39,11 +39,25 @@ export class UserController {
     user = await prisma.user.create({
       data: { ...body, logged: false, type: 0 }
     })
+
     return user
   }
 
-  @Put('update')
-  updateLogin() {
-    return 'login-token'
+  @Put('logout')
+  async logout(@Body() body: any) {
+    const user = await checkUser({ id: Number(body.id) })
+    if (!user)
+      return {
+        error: 'Use not found'
+      }
+
+    await prisma.user.update({
+      where: { id: Number(body.id) },
+      data: {
+        logged: false
+      }
+    })
+
+    return user
   }
 }
