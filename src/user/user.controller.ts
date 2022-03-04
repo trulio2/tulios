@@ -12,14 +12,7 @@ import { UserService } from './user.service'
 import { LoginUserDto } from './dto/login-user.dto'
 import { CreateUserDto } from './dto/create-user.dto'
 import { LogoutUserDto } from './dto/logout-user.dto'
-import {
-  ApiBadRequestResponse,
-  ApiNotFoundResponse,
-  ApiOkResponse,
-  ApiQuery,
-  ApiTags,
-  ApiUnauthorizedResponse
-} from '@nestjs/swagger'
+import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger'
 import { User } from './entities/user.entity'
 
 @ApiTags('User')
@@ -29,7 +22,6 @@ export class UserController {
 
   @ApiOkResponse({ type: User, isArray: true })
   @ApiQuery({ name: 'name', required: false })
-  @ApiNotFoundResponse()
   @Get()
   async getUsers(@Query('name') name?: string): Promise<User[]> {
     const users = await this.userService.users(name)
@@ -39,7 +31,6 @@ export class UserController {
   }
 
   @ApiOkResponse({ type: User })
-  @ApiNotFoundResponse()
   @Get(':id')
   async getUserById(@Param('id', ParseIntPipe) id: number): Promise<User> {
     const user = await this.userService.userById(id)
@@ -49,8 +40,6 @@ export class UserController {
   }
 
   @ApiOkResponse({ type: User })
-  @ApiNotFoundResponse()
-  @ApiBadRequestResponse()
   @Put('login')
   async putLogin(@Body() body: LoginUserDto): Promise<User> {
     const login = await this.userService.login(body)
@@ -60,8 +49,6 @@ export class UserController {
   }
 
   @ApiOkResponse({ type: User })
-  @ApiUnauthorizedResponse()
-  @ApiBadRequestResponse()
   @Post('create')
   async postCreate(@Body() body: CreateUserDto): Promise<User> {
     const create = await this.userService.create(body)
@@ -71,7 +58,6 @@ export class UserController {
   }
 
   @ApiOkResponse({ type: User })
-  @ApiNotFoundResponse()
   @Put('logout')
   async putLogout(@Body() body: LogoutUserDto): Promise<User> {
     const logout = await this.userService.logout(body)
